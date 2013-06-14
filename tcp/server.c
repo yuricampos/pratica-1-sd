@@ -107,8 +107,10 @@ char **argv;
      */
     while(strcmp(c.nome, "fim")){
     recv(ns, &c, sizeof(c), 0);
+    if(strcmp(c.nome, "fim")){
     printf("Nome do contato: %s \n",c.nome);
     printf("Telefone do contato: %s \n",c.telefone);
+}
     strcpy(c.nome, "Recebido");
     send(ns, &c, sizeof(c), 0);
     }

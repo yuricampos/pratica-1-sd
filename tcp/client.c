@@ -35,6 +35,7 @@ char **argv;
 {
     unsigned short port;       /* port client will connect to              */
     char buf[12];              /* data buffer for sending and receiving    */
+    char mensagem[12];         /* mensagem que sera lida do client         */
     struct hostent *hostnm;    /* server host name information             */
     struct sockaddr_in server; /* server address                           */
     int s;                     /* client socket                            */
@@ -66,7 +67,49 @@ char **argv;
     /*
      * Put a message into the buffer.
      */
-    strcpy(buf, "the message");
+    printf("Selecione a opcao desejada \n");
+    printf("1 - Armazenar / Atualizar um registro \n");
+    printf("2 - Remover um registro \n");
+    printf("3 - Acessar um registro \n");
+    printf("4 - Finalizar aplicacao \n");
+    int opcao;
+    scanf("%d",&opcao);
+    switch (opcao) {
+        case 1:
+        {
+        printf("\n\n Opcao escolhida: Armazenar / Atualizar um registro \n");
+        printf("Opcao em implementacao \n");
+        printf("Entre com uma mensagem a ser enviada ao server: ");
+        scanf("%s",&mensagem);
+        //fgets(mensagem, 12, stdin);
+        strcpy(buf, mensagem);
+        break;
+    }
+        case 2:
+        {
+        printf("\n\n Opcao escolhida: Remover um registro \n");
+        printf("Nada implementado! \n");
+        break;
+    }   
+
+        case 3:
+        {
+        printf("\n\n Opcao escolhida: Acessar um registro\n");
+        printf("Nada implementado! \n");
+        break;
+    }
+
+        case 4:
+        {
+        printf("\n\n Opcao escolhida: Finalizar Aplicacao\n");
+        strcpy(buf, "fim");
+        break;
+    }      
+
+    }
+
+
+
     
     /*
      * Put the server information into the server structure.

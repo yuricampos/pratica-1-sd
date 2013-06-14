@@ -105,15 +105,14 @@ char **argv;
     /*
      * Receive the message on the newly connected socket.
      */
-    if (recv(ns, &c, sizeof(c), 0) == -1)
-    {
-        perror("Recv()");
-        exit(6);
-    }
-    if(strcmp(c.nome, "fim")){
+    while(strcmp(c.nome, "fim")){
+    recv(ns, &c, sizeof(c), 0);
     printf("Nome do contato: %s \n",c.nome);
     printf("Telefone do contato: %s \n",c.telefone);
-}
+    strcpy(c.nome, "Recebido");
+    send(ns, &c, sizeof(c), 0);
+    }
+
     if(!strcmp(c.nome, "fim")){
     close(ns);
     close(s);
@@ -121,7 +120,6 @@ char **argv;
     exit(0);
     send(ns, &c, sizeof(c), 0);
     }
-    strcpy(c.nome, "Recebido");
     
     /*
      * Send the message back to the client.
@@ -129,7 +127,7 @@ char **argv;
     if (send(ns, &c, sizeof(c), 0) < 0)
     {
         perror("Send()");
-        exit(7);
+        //exit(7);
     }
 
 

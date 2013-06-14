@@ -69,48 +69,7 @@ char **argv;
      * The port is the second argument.
      */
     port = (unsigned short) atoi(argv[2]);
-    
-    /*
-     * Put a message into the buffer.
-     */
-    printf("Selecione a opcao desejada \n");
-    printf("1 - Armazenar / Atualizar um registro \n");
-    printf("2 - Remover um registro \n");
-    printf("3 - Acessar um registro \n");
-    printf("4 - Finalizar aplicacao \n");
-    int opcao;
-    scanf("%d",&opcao);
-    switch (opcao) {
-        case 1:
-        {
-        printf("\n\n Opcao escolhida: Armazenar / Atualizar um registro \n");
-        printf("Opcao em implementacao \n");
-        printf("Entre com o nome do contato ");
-        scanf("%s",&c.nome);
-        printf("Entre com o telefone do contato ");
-        scanf("%s",&c.telefone);
-        break;
-    }
-        case 2:
-        {
-        printf("\n\n Opcao escolhida: Remover um registro \n");
-        printf("Nada implementado! \n");
-        break;
-    }   
-        case 3:
-        {
-        printf("\n\n Opcao escolhida: Acessar um registro\n");
-        printf("Nada implementado! \n");
-        break;
-    }
-        case 4:
-        {
-        printf("\n\n Opcao escolhida: Finalizar Aplicacao\n");
-        strcpy(c.nome, "fim");
-        break;
-    }      
 
-    }
     /*
      * Put the server information into the server structure.
      * The port must be put into network byte order.
@@ -136,30 +95,62 @@ char **argv;
         perror("Connect()");
         exit(4);
     }
-    
-    if (send(s, &c, sizeof(c), 0) < 0)
-    {
-        perror("Send()");
-        exit(5);
-    }
-    
-    /*
-     * The server sends back the same message. Receive it into the buffer.
-     */
-    if (recv(s, &c, sizeof(c), 0) < 0)
-    {
-        perror("Recv()");
-        exit(6);
-    }
-    if(strcmp(c.nome, "fim")){
-    printf("Mensagem do server: %s \n",c.nome);
-}
 
-    if(!strcmp(c.nome, "fim")){
+    int loop = 1;
+    while(loop = 1){
+            printf("Selecione a opcao desejada \n");
+    printf("1 - Armazenar / Atualizar um registro \n");
+    printf("2 - Remover um registro \n");
+    printf("3 - Acessar um registro \n");
+    printf("4 - Finalizar aplicacao \n");
+    int opcao;
+    scanf("%d",&opcao);
+    switch (opcao) {
+        case 1:
+        {
+        printf("\n\n Opcao escolhida: Armazenar / Atualizar um registro \n");
+        printf("Opcao em implementacao \n");
+        printf("Entre com o nome do contato ");
+        scanf("%s",&c.nome);
+        printf("Entre com o telefone do contato ");
+        scanf("%s",&c.telefone);
+        send(s, &c, sizeof(c), 0);
+        recv(s, &c, sizeof(c), 0);
+        printf("Mensagem do server: %s \n",c.nome);
+        break;
+    }
+        case 2:
+        {
+        printf("\n\n Opcao escolhida: Remover um registro \n");
+        printf("Nada implementado! \n");
+        break;
+    }   
+        case 3:
+        {
+        printf("\n\n Opcao escolhida: Acessar um registro\n");
+        printf("Nada implementado! \n");
+        break;
+    }
+        case 4:
+        {
+        printf("\n\n Opcao escolhida: Finalizar Aplicacao\n");
+        strcpy(c.nome, "fim");
+        send(s, &c, sizeof(c), 0);
         close(s);
         printf("Client Ended Successfully\n");
         exit(0);
+        loop = 0;
+        break;
+    }      
+
     }
+
+    }
+
+    
+    
+
+
     
 
     

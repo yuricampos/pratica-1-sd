@@ -26,6 +26,11 @@
 #include <netdb.h>
 #include <stdio.h>
 
+typedef struct contato{
+    char nome[12];
+    char telefone[12];
+}contato;
+
 /*
  * Client Main.
  */
@@ -39,6 +44,7 @@ char **argv;
     struct hostent *hostnm;    /* server host name information             */
     struct sockaddr_in server; /* server address                           */
     int s;                     /* client socket                            */
+    contato c;                 /* contato da agenda                        */
     
     /*
      * Check Arguments Passed. Should be hostname and port.
@@ -79,10 +85,10 @@ char **argv;
         {
         printf("\n\n Opcao escolhida: Armazenar / Atualizar um registro \n");
         printf("Opcao em implementacao \n");
-        printf("Entre com uma mensagem a ser enviada ao server: ");
-        scanf("%s",&mensagem);
-        //fgets(mensagem, 12, stdin);
-        strcpy(buf, mensagem);
+        printf("Entre com o nome do contato ");
+        scanf("%s",&c.nome);
+        printf("Entre com o telefone do contato ");
+        scanf("%s",&c.telefone);
         break;
     }
         case 2:
@@ -91,26 +97,20 @@ char **argv;
         printf("Nada implementado! \n");
         break;
     }   
-
         case 3:
         {
         printf("\n\n Opcao escolhida: Acessar um registro\n");
         printf("Nada implementado! \n");
         break;
     }
-
         case 4:
         {
         printf("\n\n Opcao escolhida: Finalizar Aplicacao\n");
-        strcpy(buf, "fim");
+        strcpy(c.nome, "fim");
         break;
     }      
 
     }
-
-
-
-    
     /*
      * Put the server information into the server structure.
      * The port must be put into network byte order.
@@ -137,7 +137,7 @@ char **argv;
         exit(4);
     }
     
-    if (send(s, buf, sizeof(buf), 0) < 0)
+    if (send(s, &c, sizeof(c), 0) < 0)
     {
         perror("Send()");
         exit(5);
@@ -146,14 +146,14 @@ char **argv;
     /*
      * The server sends back the same message. Receive it into the buffer.
      */
-    if (recv(s, buf, sizeof(buf), 0) < 0)
+    if (recv(s, &c, sizeof(c), 0) < 0)
     {
         perror("Recv()");
         exit(6);
     }
-    printf("Mensagem do server: %s \n",buf);
+    printf("Mensagem do server: %s \n",c.nome);
 
-    if(!strcmp(buf, "fim")){
+    if(!strcmp(c.nome, "fim")){
         close(s);
         printf("Client Ended Successfully\n");
         exit(0);
@@ -162,4 +162,3 @@ char **argv;
 
     
 }
-

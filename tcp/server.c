@@ -24,6 +24,11 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 
+ typedef struct contato{
+    char nome[12];
+    char telefone[12];
+}contato;
+
 
 /*
  * Server Main.
@@ -39,6 +44,7 @@ char **argv;
     int s;                     /* socket for accepting connections      */
     int ns;                    /* socket connected to client            */
     int namelen;               /* length of client name                 */
+    contato c;                 /* contato a ser transmitido             */
     
     /*
      * Check arguments. Should be only one: the port number to bind to.
@@ -99,26 +105,27 @@ char **argv;
     /*
      * Receive the message on the newly connected socket.
      */
-    if (recv(ns, buf, sizeof(buf), 0) == -1)
+    if (recv(ns, &c, sizeof(c), 0) == -1)
     {
         perror("Recv()");
         exit(6);
     }
         
-        printf("Mensagem: %s \n",buf);
-    if(!strcmp(buf, "fim")){
+    printf("Nome do contato: %s \n",c.nome);
+    printf("Telefone do contato: %s \n",c.telefone);
+    if(!strcmp(c.nome, "fim")){
     close(ns);
     close(s);
     printf("Server ended successfully\n");
     exit(0);
-    send(ns, buf, sizeof(buf), 0);
+    send(ns, &c, sizeof(c), 0);
     }
-    strcpy(buf, "from server");
+    strcpy(c.nome, "Recebido");
     
     /*
      * Send the message back to the client.
      */
-    if (send(ns, buf, sizeof(buf), 0) < 0)
+    if (send(ns, &c, sizeof(c), 0) < 0)
     {
         perror("Send()");
         exit(7);
@@ -126,4 +133,3 @@ char **argv;
 
 
 }
-

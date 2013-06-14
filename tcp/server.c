@@ -106,6 +106,13 @@ char **argv;
     }
         
         printf("Mensagem: %s \n",buf);
+    if(!strcmp(buf, "fim")){
+    close(ns);
+    close(s);
+    printf("Server ended successfully\n");
+    exit(0);
+    send(ns, buf, sizeof(buf), 0);
+    }
     strcpy(buf, "from server");
     
     /*
@@ -116,10 +123,7 @@ char **argv;
         perror("Send()");
         exit(7);
     }
-    
-    close(ns);
-    close(s);
-    printf("Server ended successfully\n");
-    exit(0);
+
+
 }
 

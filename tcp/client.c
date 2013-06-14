@@ -152,14 +152,14 @@ char **argv;
         exit(6);
     }
     printf("Mensagem do server: %s \n",buf);
+
+    if(!strcmp(buf, "fim")){
+        close(s);
+        printf("Client Ended Successfully\n");
+        exit(0);
+    }
     
-    /*
-     * Close the socket.
-     */
-    close(s);
-    
-    printf("Client Ended Successfully\n");
-    exit(0);
+
     
 }
 

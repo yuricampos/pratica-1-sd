@@ -110,9 +110,10 @@ char **argv;
         perror("Recv()");
         exit(6);
     }
-        
+    if(strcmp(c.nome, "fim")){
     printf("Nome do contato: %s \n",c.nome);
     printf("Telefone do contato: %s \n",c.telefone);
+}
     if(!strcmp(c.nome, "fim")){
     close(ns);
     close(s);

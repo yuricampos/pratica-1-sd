@@ -151,7 +151,9 @@ char **argv;
         perror("Recv()");
         exit(6);
     }
+    if(strcmp(c.nome, "fim")){
     printf("Mensagem do server: %s \n",c.nome);
+}
 
     if(!strcmp(c.nome, "fim")){
         close(s);

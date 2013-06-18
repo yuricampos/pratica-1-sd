@@ -1,6 +1,6 @@
 /********************************************************copyrite.xic***/
 /*                                                                     */
-/*   Licensed Materials - Property of IBM                              */
+/*   Licensed Materials - Property of IBM  1                           */
 /*                                                                     */
 /*   This product contains "Restricted Materials of IBM":              */
 /*      Program Number:   5798RXW                                      */

@@ -141,6 +141,11 @@ char **argv;
         {
         printf("\n\n Opcao escolhida: Remover um registro\n");
         c.operacao = 3;
+        printf("Entre com o nome do contato ");
+        scanf("%s",&c.nome);
+        send(s, &c, sizeof(c), 0);
+        recv(s, &c, sizeof(c), 0);
+        printf("Status: %s \n",c.status);
         break;
     }
         case 4:

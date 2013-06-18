@@ -133,17 +133,22 @@ char **argv;
     datum_set(key, c.nome);
     datum_set(data, c.telefone);
         if( !(dbf = gdbm_open(dbname, 0, GDBM_WRCREAT, 0644, NULL)) ) {
-        printf("%s\n", gdbm_strerror(gdbm_errno));
-        return 1;
+        status = "Erro!";
+        strcpy(c.status, status);
+        send(ns, &c, sizeof(c), 0);
     }
     if( gdbm_store(dbf, key, data, GDBM_INSERT) ) {
-        status = "\nRecord may be exist.\n";
+        status = "Erro!";
         strcpy(c.status, status);
         send(ns, &c, sizeof(c), 0);
         gdbm_close(dbf);
-    }
-    status =  "\nStoring record successed.\n";
+    } else{
+    status =  "Armazenado";
+    strcpy(c.status, status);
+    send(ns, &c, sizeof(c), 0);
     gdbm_close(dbf);
+
+    }
 }
 
     if(c.operacao == 4){
@@ -159,11 +164,38 @@ char **argv;
         printf("%s:\t%s\n",  key.dptr, data.dptr);
         strcpy(c.nome, key.dptr);
         strcpy(c.telefone, data.dptr);
-        
+        status = "Recuperado";
+        strcpy(c.status, status);
+        send(ns, &c, sizeof(c), 0);
+
 
     }
-    strcpy(c.status, status);
-    send(ns, &c, sizeof(c), 0);
+
+        if(c.operacao == 3){
+        GDBM_FILE dbf;
+        datum key, data;
+        dbf = gdbm_open(dbname, 0, GDBM_WRITER, 0, NULL);
+        if( !dbf ) {
+        printf("%s\n", gdbm_strerror(gdbm_errno));
+    }
+        key.dptr = c.nome;
+        key.dsize = strlen(c.nome);
+        if(gdbm_delete(dbf, key)) {
+        status = "Erro!";
+        strcpy(c.status, status);
+        send(ns, &c, sizeof(c), 0);
+        gdbm_close(dbf);
+    } else{
+        status = "Removido!";
+        strcpy(c.status, status);
+        send(ns, &c, sizeof(c), 0);
+        gdbm_close(dbf);
+
+    }
+
+    }
+
+
     }
 
     if(c.operacao == 5){

@@ -23,11 +23,26 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <gdbm.h>
+#include <stdlib.h>
+#include <string.h>
+#define datum_set(um, buf) { um.dptr = buf; um.dsize = strlen(buf); }
 
+ /**
+ * Operacoes
+ * 1 - Inclusao
+ * 2 - Atualizar
+ * 3 - Remover
+ * 4 - Acessar
+ * 5 - Finalizar App
+ */
  typedef struct contato{
+    int operacao; 
     char nome[12];
     char telefone[12];
+    char status[12];
 }contato;
+
 
 
 /*
@@ -37,7 +52,9 @@ main(argc, argv)
 int argc;
 char **argv;
 {
+    char* dbname = "bdsd";
     unsigned short port;       /* port server binds to                  */
+    char* status;
     char buf[12];              /* buffer for sending and receiving data */
     struct sockaddr_in client; /* client address information            */
     struct sockaddr_in server; /* server address information            */
@@ -45,6 +62,7 @@ char **argv;
     int ns;                    /* socket connected to client            */
     int namelen;               /* length of client name                 */
     contato c;                 /* contato a ser transmitido             */
+
     
     /*
      * Check arguments. Should be only one: the port number to bind to.
@@ -105,17 +123,50 @@ char **argv;
     /*
      * Receive the message on the newly connected socket.
      */
-    while(strcmp(c.nome, "fim")){
+    while(c.operacao != 5){
     recv(ns, &c, sizeof(c), 0);
-    if(strcmp(c.nome, "fim")){
+    if(c.operacao == 1){
     printf("Nome do contato: %s \n",c.nome);
     printf("Telefone do contato: %s \n",c.telefone);
+    GDBM_FILE dbf;
+    datum key, data;
+    datum_set(key, c.nome);
+    datum_set(data, c.telefone);
+        if( !(dbf = gdbm_open(dbname, 0, GDBM_WRCREAT, 0644, NULL)) ) {
+        printf("%s\n", gdbm_strerror(gdbm_errno));
+        return 1;
+    }
+    if( gdbm_store(dbf, key, data, GDBM_INSERT) ) {
+        status = "\nRecord may be exist.\n";
+        strcpy(c.status, status);
+        send(ns, &c, sizeof(c), 0);
+        gdbm_close(dbf);
+    }
+    status =  "\nStoring record successed.\n";
+    gdbm_close(dbf);
 }
-    strcpy(c.nome, "Recebido");
+
+    if(c.operacao == 4){
+        GDBM_FILE dbf;
+        datum key, data;
+        dbf = gdbm_open(dbname, 0, GDBM_WRITER, 0, NULL);
+        if( !dbf ) {
+        printf("%s\n", gdbm_strerror(gdbm_errno));
+    }
+        key.dptr = c.nome;
+        key.dsize = strlen(c.nome);
+        data = gdbm_fetch(dbf, key);
+        printf("%s:\t%s\n",  key.dptr, data.dptr);
+        strcpy(c.nome, key.dptr);
+        strcpy(c.telefone, data.dptr);
+        
+
+    }
+    strcpy(c.status, status);
     send(ns, &c, sizeof(c), 0);
     }
 
-    if(!strcmp(c.nome, "fim")){
+    if(c.operacao == 5){
     close(ns);
     close(s);
     printf("Server ended successfully\n");

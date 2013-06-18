@@ -26,9 +26,19 @@
 #include <netdb.h>
 #include <stdio.h>
 
-typedef struct contato{
+ /**
+ * Operacoes
+ * 1 - Inclusao
+ * 2 - Atualizar
+ * 3 - Remover
+ * 4 - Acessar
+ * 5 - Finalizar App
+ */
+ typedef struct contato{
+    int operacao; 
     char nome[12];
     char telefone[12];
+    char status[12];
 }contato;
 
 /*
@@ -99,10 +109,11 @@ char **argv;
     int loop = 1;
     while(loop = 1){
             printf("Selecione a opcao desejada \n");
-    printf("1 - Armazenar / Atualizar um registro \n");
-    printf("2 - Remover um registro \n");
-    printf("3 - Acessar um registro \n");
-    printf("4 - Finalizar aplicacao \n");
+    printf("1 - Armazenar \n");
+    printf("2 - Atualizar um registro \n");
+    printf("3 - Remover um registro \n");
+    printf("4 - Acessar um registro \n");
+    printf("5 - Finalizar aplicacao \n");
     int opcao;
     scanf("%d",&opcao);
     switch (opcao) {
@@ -114,9 +125,10 @@ char **argv;
         scanf("%s",&c.nome);
         printf("Entre com o telefone do contato ");
         scanf("%s",&c.telefone);
+        c.operacao = 1;
         send(s, &c, sizeof(c), 0);
         recv(s, &c, sizeof(c), 0);
-        printf("Mensagem do server: %s \n",c.nome);
+        printf("Mensagem do server: %s \n",c.status);
         break;
     }
         case 2:
@@ -127,21 +139,34 @@ char **argv;
     }   
         case 3:
         {
-        printf("\n\n Opcao escolhida: Acessar um registro\n");
-        printf("Nada implementado! \n");
+        printf("\n\n Opcao escolhida: Remover um registro\n");
+        c.operacao = 3;
         break;
     }
         case 4:
         {
+        printf("\n\n Opcao escolhida: Acessar um registro\n");
+        c.operacao = 4;
+        printf("Entre com o nome do contato ");
+        scanf("%s",&c.nome);
+        send(s, &c, sizeof(c), 0);
+        recv(s, &c, sizeof(c), 0);
+        printf("Nome: %s \n",c.nome);
+        printf("Telefone: %s \n",c.telefone);
+        break;
+    }
+        case 5:
+        {
         printf("\n\n Opcao escolhida: Finalizar Aplicacao\n");
-        strcpy(c.nome, "fim");
+        c.operacao = 5;
         send(s, &c, sizeof(c), 0);
         close(s);
         printf("Client Ended Successfully\n");
         exit(0);
         loop = 0;
         break;
-    }      
+
+        }      
 
     }
 

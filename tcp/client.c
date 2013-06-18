@@ -28,8 +28,7 @@
 
  /**
  * Operacoes
- * 1 - Inclusao
- * 2 - Atualizar
+ * 1 - Inclusao / atualizar
  * 3 - Remover
  * 4 - Acessar
  * 5 - Finalizar App
@@ -49,7 +48,6 @@ int argc;
 char **argv;
 {
     unsigned short port;       /* port client will connect to              */
-    char buf[12];              /* data buffer for sending and receiving    */
     char mensagem[12];         /* mensagem que sera lida do client         */
     struct hostent *hostnm;    /* server host name information             */
     struct sockaddr_in server; /* server address                           */
@@ -109,11 +107,10 @@ char **argv;
     int loop = 1;
     while(loop = 1){
             printf("Selecione a opcao desejada \n");
-    printf("1 - Armazenar \n");
-    printf("2 - Atualizar um registro \n");
-    printf("3 - Remover um registro \n");
-    printf("4 - Acessar um registro \n");
-    printf("5 - Finalizar aplicacao \n");
+    printf("1 - Armazenar / Atualizar \n");
+    printf("2 - Remover um registro \n");
+    printf("3 - Acessar um registro \n");
+    printf("4 - Finalizar aplicacao \n");
     int opcao;
     scanf("%d",&opcao);
     switch (opcao) {
@@ -131,16 +128,11 @@ char **argv;
         printf("Mensagem do server: %s \n",c.status);
         break;
     }
+  
         case 2:
         {
-        printf("\n\n Opcao escolhida: Remover um registro \n");
-        printf("Nada implementado! \n");
-        break;
-    }   
-        case 3:
-        {
         printf("\n\n Opcao escolhida: Remover um registro\n");
-        c.operacao = 3;
+        c.operacao = 2;
         printf("Entre com o nome do contato ");
         scanf("%s",&c.nome);
         send(s, &c, sizeof(c), 0);
@@ -148,10 +140,10 @@ char **argv;
         printf("Status: %s \n",c.status);
         break;
     }
-        case 4:
+        case 3:
         {
         printf("\n\n Opcao escolhida: Acessar um registro\n");
-        c.operacao = 4;
+        c.operacao = 3;
         printf("Entre com o nome do contato ");
         scanf("%s",&c.nome);
         send(s, &c, sizeof(c), 0);
@@ -160,10 +152,10 @@ char **argv;
         printf("Telefone: %s \n",c.telefone);
         break;
     }
-        case 5:
+        case 4:
         {
         printf("\n\n Opcao escolhida: Finalizar Aplicacao\n");
-        c.operacao = 5;
+        c.operacao = 4;
         send(s, &c, sizeof(c), 0);
         close(s);
         printf("Client Ended Successfully\n");

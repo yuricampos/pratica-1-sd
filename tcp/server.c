@@ -30,8 +30,7 @@
 
  /**
  * Operacoes
- * 1 - Inclusao
- * 2 - Atualizar
+ * 1 - Inclusao / Alteracao
  * 3 - Remover
  * 4 - Acessar
  * 5 - Finalizar App
@@ -138,7 +137,9 @@ char **argv;
         send(ns, &c, sizeof(c), 0);
     }
     if( gdbm_store(dbf, key, data, GDBM_INSERT) ) {
-        status = "Erro!";
+        gdbm_delete(dbf, key);
+        gdbm_store(dbf, key, data, GDBM_INSERT);
+        status = "Atualizado!";
         strcpy(c.status, status);
         send(ns, &c, sizeof(c), 0);
         gdbm_close(dbf);
@@ -151,7 +152,8 @@ char **argv;
     }
 }
 
-    if(c.operacao == 4){
+
+    if(c.operacao == 3){
         GDBM_FILE dbf;
         datum key, data;
         dbf = gdbm_open(dbname, 0, GDBM_WRITER, 0, NULL);
@@ -171,7 +173,7 @@ char **argv;
 
     }
 
-        if(c.operacao == 3){
+        if(c.operacao == 2){
         GDBM_FILE dbf;
         datum key, data;
         dbf = gdbm_open(dbname, 0, GDBM_WRITER, 0, NULL);
@@ -198,7 +200,7 @@ char **argv;
 
     }
 
-    if(c.operacao == 5){
+    if(c.operacao == 4){
     close(ns);
     close(s);
     printf("Server ended successfully\n");

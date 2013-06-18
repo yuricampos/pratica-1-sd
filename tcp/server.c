@@ -122,7 +122,7 @@ char **argv;
     /*
      * Receive the message on the newly connected socket.
      */
-    while(c.operacao != 5){
+    while(c.operacao != 4){
     recv(ns, &c, sizeof(c), 0);
     GDBM_FILE dbf;
     datum key, data;

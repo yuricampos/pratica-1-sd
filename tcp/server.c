@@ -37,9 +37,9 @@
  */
  typedef struct contato{
     int operacao; 
-    char nome[12];
-    char telefone[12];
-    char status[12];
+    char nome[256];
+    char telefone[256];
+    char status[256];
 }contato;
 
 
@@ -124,18 +124,19 @@ char **argv;
      */
     while(c.operacao != 5){
     recv(ns, &c, sizeof(c), 0);
-    if(c.operacao == 1){
-    printf("Nome do contato: %s \n",c.nome);
-    printf("Telefone do contato: %s \n",c.telefone);
     GDBM_FILE dbf;
     datum key, data;
     datum_set(key, c.nome);
     datum_set(data, c.telefone);
-        if( !(dbf = gdbm_open(dbname, 0, GDBM_WRCREAT, 0644, NULL)) ) {
-        status = "Erro!";
+    if( !(dbf = gdbm_open(dbname, 0, GDBM_WRCREAT, 0644, NULL)) ) {
+        status = "Erro Conexao!";
         strcpy(c.status, status);
         send(ns, &c, sizeof(c), 0);
     }
+
+    if(c.operacao == 1){
+    printf("Nome do contato: %s \n",c.nome);
+    printf("Telefone do contato: %s \n",c.telefone);
     if( gdbm_store(dbf, key, data, GDBM_INSERT) ) {
         gdbm_delete(dbf, key);
         gdbm_store(dbf, key, data, GDBM_INSERT);
@@ -154,32 +155,30 @@ char **argv;
 
 
     if(c.operacao == 3){
-        GDBM_FILE dbf;
-        datum key, data;
-        dbf = gdbm_open(dbname, 0, GDBM_WRITER, 0, NULL);
-        if( !dbf ) {
-        printf("%s\n", gdbm_strerror(gdbm_errno));
-    }
         key.dptr = c.nome;
         key.dsize = strlen(c.nome);
+        if(!gdbm_exists(dbf, key)){
+        status = "Nao existe!";
+        strcpy(c.status, status);
+        send(ns, &c, sizeof(c), 0);
+         } else{
+
         data = gdbm_fetch(dbf, key);
-        printf("%s:\t%s\n",  key.dptr, data.dptr);
         strcpy(c.nome, key.dptr);
         strcpy(c.telefone, data.dptr);
         status = "Recuperado";
         strcpy(c.status, status);
         send(ns, &c, sizeof(c), 0);
 
+         }
+
+
+
+
 
     }
 
         if(c.operacao == 2){
-        GDBM_FILE dbf;
-        datum key, data;
-        dbf = gdbm_open(dbname, 0, GDBM_WRITER, 0, NULL);
-        if( !dbf ) {
-        printf("%s\n", gdbm_strerror(gdbm_errno));
-    }
         key.dptr = c.nome;
         key.dsize = strlen(c.nome);
         if(gdbm_delete(dbf, key)) {

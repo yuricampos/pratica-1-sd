@@ -35,9 +35,9 @@
  */
  typedef struct contato{
     int operacao; 
-    char nome[12];
-    char telefone[12];
-    char status[12];
+    char nome[256];
+    char telefone[256];
+    char status[256];
 }contato;
 
 /*
@@ -48,7 +48,6 @@ int argc;
 char **argv;
 {
     unsigned short port;       /* port client will connect to              */
-    char mensagem[12];         /* mensagem que sera lida do client         */
     struct hostent *hostnm;    /* server host name information             */
     struct sockaddr_in server; /* server address                           */
     int s;                     /* client socket                            */
@@ -148,8 +147,12 @@ char **argv;
         scanf("%s",&c.nome);
         send(s, &c, sizeof(c), 0);
         recv(s, &c, sizeof(c), 0);
-        printf("Nome: %s \n",c.nome);
-        printf("Telefone: %s \n",c.telefone);
+        if(!strcmp(c.status, "Nao existe!")){
+            printf("Status: %s \n",c.status);
+        } else{
+            printf("Nome: %s \n",c.nome);
+            printf("Telefone: %s \n",c.telefone);
+        }
         break;
     }
         case 4:

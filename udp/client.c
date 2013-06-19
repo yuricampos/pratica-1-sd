@@ -122,10 +122,7 @@ char **argv;
         case 4:
         {
         printf("\n\n Opcao escolhida: Finalizar Aplicacao\n");
-        c.operacao = 4;
-        sendto(s, &c, sizeof(c), 0, (struct sockaddr *)&server, sizeof(server));
         close(s);
-        printf("Client Ended Successfully\n");
         exit(0);
         loop = 0;
         break;

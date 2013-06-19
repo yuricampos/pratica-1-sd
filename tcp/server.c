@@ -30,6 +30,7 @@
 
  /**
  * Operacoes
+ * Estrutura a ser transmitida entre client e server
  * 1 - Inclusao / Alteracao
  * 3 - Remover
  * 4 - Acessar
@@ -51,9 +52,9 @@ main(argc, argv)
 int argc;
 char **argv;
 {
-    char* dbname = "bdsd";
+    char* dbname = "bdsd";     /* nome do banco de dados                */
     unsigned short port;       /* port server binds to                  */
-    char* status;
+    char* status;              /* char de status que e enviado          */
     char buf[12];              /* buffer for sending and receiving data */
     struct sockaddr_in client; /* client address information            */
     struct sockaddr_in server; /* server address information            */
@@ -119,56 +120,73 @@ char **argv;
         exit(5);
     }
     
-    /*
-     * Receive the message on the newly connected socket.
-     */
-    while(c.operacao != 4){
-    recv(ns, &c, sizeof(c), 0);
-    GDBM_FILE dbf;
-    datum key, data;
-    datum_set(key, c.nome);
-    datum_set(data, c.telefone);
+
+    while(c.operacao != 4){ // while mantem conexao aberta no lado do server
+    recv(ns, &c, sizeof(c), 0); // recebe do client
+    GDBM_FILE dbf; // arquivo de banco de dados
+    // datum tipo de dados que vem da biblioteca gdbm.h
+    datum key, data; // chave e valor a ser salvo no banco de dados
+    datum_set(key, c.nome); // seta c.nome (nome do contato) na variavel key (chave) do bd
+    datum_set(data, c.telefone); // seta c.telefone (fone do conta.) na variavel data do bd
     if( !(dbf = gdbm_open(dbname, 0, GDBM_WRCREAT, 0644, NULL)) ) {
+        // caso nao seja possivel abrir o banco de dados da erro
         status = "Erro Conexao!";
         strcpy(c.status, status);
         send(ns, &c, sizeof(c), 0);
     }
-
+    // Se operacao e adicionar ou atualizar contato
     if(c.operacao == 1){
-    printf("Nome do contato: %s \n",c.nome);
-    printf("Telefone do contato: %s \n",c.telefone);
-    if( gdbm_store(dbf, key, data, GDBM_INSERT) ) {
-        gdbm_delete(dbf, key);
-        gdbm_store(dbf, key, data, GDBM_INSERT);
-        status = "Atualizado!";
-        strcpy(c.status, status);
-        send(ns, &c, sizeof(c), 0);
-        gdbm_close(dbf);
-    } else{
-    status =  "Armazenado";
-    strcpy(c.status, status);
-    send(ns, &c, sizeof(c), 0);
-    gdbm_close(dbf);
+        // tudo que e gdbm vem do banco de dados
+    if( gdbm_store(dbf, key, data, GDBM_INSERT) ) { // se ja existe registro
+        gdbm_delete(dbf, key); // apaga registro
+        gdbm_store(dbf, key, data, GDBM_INSERT); // faz novo registro
+        status = "Atualizado!"; // seta status a ser enviado a client
+        strcpy(c.status, status); // copia status para estrutura a ser enviada
+        send(ns, &c, sizeof(c), 0); // envia para cliente
+        gdbm_close(dbf); // fecha banco de dados
+    } else{ // caso nao exista registro cria um registro
+    status =  "Armazenado"; // seta status
+    strcpy(c.status, status); // coloca status na estrutura a ser enviada para client
+    send(ns, &c, sizeof(c), 0); // envia estrutura para cliente
+    gdbm_close(dbf); // fecha banco de dados
 
     }
 }
 
+        if(c.operacao == 2){ // remover contato recebido (do banco)
+        key.dptr = c.nome; // seta nome do contato como key
+        key.dsize = strlen(c.nome); //seta size da key
+        if(gdbm_delete(dbf, key)) { // tenta deletar acessa if apenas em caso de erro
+        status = "Erro!"; // seta erro no status
+        strcpy(c.status, status); //copia status para estrutura a ser enviada
+        send(ns, &c, sizeof(c), 0); //envia estrutura para cliente
+        gdbm_close(dbf); // fecha banco de dados
+    } else{ // removido com sucesso
+        status = "Removido!"; // seta mensagem no status
+        strcpy(c.status, status); //copia status para estrutura a ser enviada
+        send(ns, &c, sizeof(c), 0); //enviar status para o cliente
+        gdbm_close(dbf); // fechar bd
 
-    if(c.operacao == 3){
-        key.dptr = c.nome;
-        key.dsize = strlen(c.nome);
-        if(!gdbm_exists(dbf, key)){
-        status = "Nao existe!";
-        strcpy(c.status, status);
-        send(ns, &c, sizeof(c), 0);
-         } else{
+    }
 
-        data = gdbm_fetch(dbf, key);
-        strcpy(c.nome, key.dptr);
-        strcpy(c.telefone, data.dptr);
-        status = "Recuperado";
-        strcpy(c.status, status);
-        send(ns, &c, sizeof(c), 0);
+    }
+
+
+    if(c.operacao == 3){ // recuperar contato no banco (buscar)
+        key.dptr = c.nome; // seta nome do contato como key
+        key.dsize = strlen(c.nome); //seta size da key
+        if(!gdbm_exists(dbf, key)){ // verificar existencia entra no if caso nao exista no bd
+        status = "Nao existe!"; // seta erro no status
+        strcpy(c.status, status); //copia status para estrutura a ser enviada
+        send(ns, &c, sizeof(c), 0); //enviar status para o cliente
+         } else{ //existe no banco o registro
+
+        data = gdbm_fetch(dbf, key); //recupera
+        strcpy(c.nome, key.dptr); //copia key para estrutura
+        strcpy(c.telefone, data.dptr); //copia dado recuperado para estrutura
+        status = "Recuperado"; //seta status
+        strcpy(c.status, status); //copia status para estrutura
+        send(ns, &c, sizeof(c), 0); //envia estrutura
 
          }
 
@@ -178,43 +196,8 @@ char **argv;
 
     }
 
-        if(c.operacao == 2){
-        key.dptr = c.nome;
-        key.dsize = strlen(c.nome);
-        if(gdbm_delete(dbf, key)) {
-        status = "Erro!";
-        strcpy(c.status, status);
-        send(ns, &c, sizeof(c), 0);
-        gdbm_close(dbf);
-    } else{
-        status = "Removido!";
-        strcpy(c.status, status);
-        send(ns, &c, sizeof(c), 0);
-        gdbm_close(dbf);
-
-    }
-
-    }
 
 
     }
-
-    if(c.operacao == 4){
-    close(ns);
-    close(s);
-    printf("Server ended successfully\n");
-    exit(0);
-    send(ns, &c, sizeof(c), 0);
-    }
-    
-    /*
-     * Send the message back to the client.
-     */
-    if (send(ns, &c, sizeof(c), 0) < 0)
-    {
-        perror("Send()");
-        //exit(7);
-    }
-
 
 }

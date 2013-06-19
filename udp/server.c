@@ -112,8 +112,6 @@ main()
     }
 
     if(c.operacao == 1){
-    printf("Nome do contato: %s \n",c.nome);
-    printf("Telefone do contato: %s \n",c.telefone);
     if( gdbm_store(dbf, key, data, GDBM_INSERT) ) {
         gdbm_delete(dbf, key);
         gdbm_store(dbf, key, data, GDBM_INSERT);
@@ -175,31 +173,6 @@ main()
 
 
     }
-
-    if(c.operacao == 4){
-    close(s);
-    printf("Server ended successfully\n");
-    exit(0);
-    sendto(s,&c,sizeof(c),0,(struct sockaddr *)&client,client_address_size);
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

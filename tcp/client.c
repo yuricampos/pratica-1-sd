@@ -104,65 +104,62 @@ char **argv;
     }
 
     int loop = 1;
-    while(loop = 1){
-            printf("Selecione a opcao desejada \n");
-    printf("1 - Armazenar / Atualizar \n");
-    printf("2 - Remover um registro \n");
-    printf("3 - Acessar um registro \n");
-    printf("4 - Finalizar aplicacao \n");
+    while(loop = 1){ // faz ficar voltando no meu apos realizar operacao
+    printf("Selecione a opcao desejada \n"); //menu
+    printf("1 - Armazenar / Atualizar \n"); //menu
+    printf("2 - Remover um registro \n"); //menu
+    printf("3 - Acessar um registro \n"); //menu
+    printf("4 - Finalizar aplicacao \n"); //menu
     int opcao;
-    scanf("%d",&opcao);
+    scanf("%d",&opcao); //le opcao
     switch (opcao) {
         case 1:
         {
         printf("\n\n Opcao escolhida: Armazenar / Atualizar um registro \n");
         printf("Opcao em implementacao \n");
         printf("Entre com o nome do contato ");
-        scanf("%s",&c.nome);
+        scanf("%s",&c.nome); //le nome do contato e salva na estrutura
         printf("Entre com o telefone do contato ");
-        scanf("%s",&c.telefone);
-        c.operacao = 1;
-        send(s, &c, sizeof(c), 0);
-        recv(s, &c, sizeof(c), 0);
-        printf("Mensagem do server: %s \n",c.status);
+        scanf("%s",&c.telefone); //le telefone e salva na estrutura
+        c.operacao = 1; //seta operacao na estrutura
+        send(s, &c, sizeof(c), 0); //envia pro servidor estrutura
+        recv(s, &c, sizeof(c), 0); //recebe estrutura do servidor
+        printf("Mensagem do server: %s \n",c.status); //printa status recebido do server
         break;
     }
   
         case 2:
         {
         printf("\n\n Opcao escolhida: Remover um registro\n");
-        c.operacao = 2;
+        c.operacao = 2; //seta operacao na estrutura
         printf("Entre com o nome do contato ");
-        scanf("%s",&c.nome);
-        send(s, &c, sizeof(c), 0);
-        recv(s, &c, sizeof(c), 0);
-        printf("Status: %s \n",c.status);
+        scanf("%s",&c.nome); //le o nome e salva na estrutura
+        send(s, &c, sizeof(c), 0); //envio estrutura para o servidor
+        recv(s, &c, sizeof(c), 0);  //recebe estrutura do servidor
+        printf("Status: %s \n",c.status); //printa status vindo do servidor na estrutura
         break;
     }
         case 3:
         {
         printf("\n\n Opcao escolhida: Acessar um registro\n");
-        c.operacao = 3;
-        printf("Entre com o nome do contato ");
-        scanf("%s",&c.nome);
-        send(s, &c, sizeof(c), 0);
-        recv(s, &c, sizeof(c), 0);
-        if(!strcmp(c.status, "Nao existe!")){
-            printf("Status: %s \n",c.status);
-        } else{
-            printf("Nome: %s \n",c.nome);
-            printf("Telefone: %s \n",c.telefone);
+        c.operacao = 3; //seta operacao na estrutura
+        printf("Entre com o nome do contato "); 
+        scanf("%s",&c.nome); //le o nome do contato e salva na estrutura
+        send(s, &c, sizeof(c), 0); //envia estrutura pro servidor
+        recv(s, &c, sizeof(c), 0); //recebe estrutura de volta do servidor 
+        if(!strcmp(c.status, "Nao existe!")){ // se na estrutura que voltou falou nao existe
+            printf("Status: %s \n",c.status); // printa status
+        } else{ //se estrutura falou que existe
+            printf("Nome: %s \n",c.nome); // printa nome que veio na estrutura
+            printf("Telefone: %s \n",c.telefone); // printa telefone que veio na estrutura
         }
         break;
     }
         case 4:
         {
         printf("\n\n Opcao escolhida: Finalizar Aplicacao\n");
-        c.operacao = 4;
-        send(s, &c, sizeof(c), 0);
-        close(s);
-        printf("Client Ended Successfully\n");
-        exit(0);
+        close(s); //fecha socket
+        exit(0); // fecha o programa
         loop = 0;
         break;
 
